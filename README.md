@@ -141,12 +141,29 @@ All demo accounts use password: **`Demo@123`**
 
 ## ☁️ Cloud Deployment
 
-### 1. One-Click Cloud Deployment (Render / Railway)
+### 1. Deploy Frontend to Vercel (1-Click)
+Deploy the React interface directly to Vercel with one click:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShashwat072006%2FHackForge__&root-directory=leavema)
+
+- **Direct Vercel Deploy Link**: [Deploy on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShashwat072006%2FHackForge__&root-directory=leavema)
+- **Settings in Vercel**:
+  - **Framework Preset**: Vite
+  - **Root Directory**: `leavema`
+  - **Environment Variables** (Optional, if connecting to a live backend):
+    - `VITE_API_BASE_URL`: `https://your-backend-service.onrender.com/api`
+    - `VITE_USE_REAL_BACKEND`: `true` (or `false` for standalone offline demo mode)
+
+---
+
+### 2. Deploy Full-Stack (Backend + Frontend) via Docker (Render / Railway)
 This repository includes a multi-stage [`Dockerfile`](file:///c:/Users/shash/OneDrive/Desktop/Hackforge/Dockerfile) and [`render.yaml`](file:///c:/Users/shash/OneDrive/Desktop/Hackforge/render.yaml) specification:
 - **Render.com**: Connect this GitHub repo (`https://github.com/Shashwat072006/HackForge__`) → Select **Blueprint** or **Web Service (Docker)** → Deploy.
 - **Railway.app**: New Project → Deploy from GitHub repo → Railway detects the `Dockerfile` automatically.
 
-### 2. Docker Local Run
+---
+
+### 3. Docker Local Run
 ```bash
 docker build -t hackforge-leave-system .
 docker run -p 8080:8080 hackforge-leave-system
