@@ -7,6 +7,7 @@ import com.company.leave.domain.ReportType;
 import com.company.leave.repository.GeneratedReportRepository;
 import com.company.leave.repository.LeaveRequestRepository;
 import com.company.leave.service.ReportService;
+import com.company.leave.web.dto.ReportDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -43,13 +44,13 @@ public class ReportController {
 
     @GetMapping
     @Operation(summary = "List all generated reports")
-    public ResponseEntity<List<GeneratedReport>> list() {
-        return ResponseEntity.ok(reportService.listReports());
+    public ResponseEntity<List<ReportDto>> list() {
+        return ResponseEntity.ok(reportService.listReports().stream().map(ReportDto::from).toList());
     }
 
     @PostMapping({"/generate", "/monthly"})
     @Operation(summary = "Generate a report for date range or monthly")
-    public ResponseEntity<GeneratedReport> generate(
+    public ResponseEntity<ReportDto> generate(
             @AuthenticationPrincipal Employee employee,
             @RequestBody(required = false) Map<String, String> body,
             @RequestParam(required = false) String yearMonth) {
@@ -62,7 +63,7 @@ public class ReportController {
         } else if (yearMonth != null && !yearMonth.isBlank()) {
             ym = YearMonth.parse(yearMonth);
         }
-        return ResponseEntity.ok(reportService.generateMonthly(ym, employee));
+        return ResponseEntity.ok(ReportDto.from(reportService.generateMonthly(ym, employee)));
     }
 
     @GetMapping("/approved-leaves.xlsx")

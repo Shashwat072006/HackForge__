@@ -3,7 +3,13 @@ echo ========================================================
 echo   Hackforge - Starting Backend and Frontend
 echo ========================================================
 
-set "JAVA_HOME=C:\Users\shash\AppData\Local\Programs\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
+if "%JAVA_HOME%"=="" (
+    if exist "C:\Users\shash\AppData\Local\Programs\Eclipse Adoptium\jdk-21.0.8.9-hotspot" (
+        set "JAVA_HOME=C:\Users\shash\AppData\Local\Programs\Eclipse Adoptium\jdk-21.0.8.9-hotspot"
+    ) else if exist "C:\Program Files\Java\jdk-24" (
+        set "JAVA_HOME=C:\Program Files\Java\jdk-24"
+    )
+)
 
 echo Starting Spring Boot Backend on http://localhost:8080 ...
 start "Hackforge Backend" cmd /k "cd leave-management && .\mvnw.cmd spring-boot:run"

@@ -4,6 +4,7 @@ import com.company.leave.domain.*;
 import com.company.leave.domain.exception.ResourceNotFoundException;
 import com.company.leave.repository.*;
 import com.company.leave.service.BalanceService;
+import com.company.leave.web.dto.BalanceDto;
 import com.company.leave.web.dto.CreateEmployeeRequest;
 import com.company.leave.web.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ public class HrController {
     private final HolidayRepository holidayRepo;
     private final PeakPeriodRepository peakPeriodRepo;
     private final BalanceService balanceService;
+    private final LeaveBalanceRepository balanceRepo;
     private final PasswordEncoder passwordEncoder;
 
     // ── Employees ─────────────────────────────────────────────────────────────
@@ -44,31 +46,62 @@ public class HrController {
         );
     }
 
+    /**
+     * Create a new employee.
+     * Returns {@code { employee, balances }} to match the frontend
+     * {@code CreateEmployeeResult} interface.
+     */
     @PostMapping("/employees")
     @PreAuthorize("hasRole('HR') or hasRole('ADMIN')")
     @Operation(summary = "Create a new employee (HR/Admin)")
-    public ResponseEntity<UserDto> createEmployee(@Valid @RequestBody CreateEmployeeRequest req) {
+    public ResponseEntity<Map<String, Object>> createEmployee(
+            @Valid @RequestBody CreateEmployeeRequest req) {
+
         var team = teamRepo.findById(req.teamId())
                 .orElseThrow(() -> new ResourceNotFoundException("Team", req.teamId()));
+
         Employee manager = null;
         if (req.managerId() != null) {
             manager = employeeRepo.findById(req.managerId())
                     .orElseThrow(() -> new ResourceNotFoundException("Manager", req.managerId()));
         }
+
+        // Resolve role — default EMPLOYEE when not provided
+        EmployeeRole role = req.role() != null ? req.role() : EmployeeRole.EMPLOYEE;
+
+        // Hash password — fall back to Demo@123 when blank
+        String rawPassword = (req.password() != null && !req.password().isBlank())
+                ? req.password()
+                : "Demo@123";
+
         Employee emp = employeeRepo.save(Employee.builder()
-                .name(req.name()).email(req.email())
-                .passwordHash(passwordEncoder.encode("Demo@123"))
-                .role(EmployeeRole.EMPLOYEE)
-                .team(team).manager(manager)
+                .name(req.name())
+                .email(req.email())
+                .passwordHash(passwordEncoder.encode(rawPassword))
+                .role(role)
+                .team(team)
+                .manager(manager)
                 .joinDate(req.joinDate())
                 .capacityFte(req.capacityFte())
                 .jobRole(req.jobRole())
-                .active(true).build());
+                .active(true)
+                .build());
 
         balanceService.initBalancesForEmployee(emp, LocalDate.now().getYear());
 
-        return ResponseEntity.created(URI.create("/api/employees/" + emp.getId()))
-                .body(UserDto.from(emp));
+        // Reload balances so the frontend can show pro-rated values
+        List<BalanceDto> balances = balanceRepo.findByEmployee(emp)
+                .stream()
+                .map(BalanceDto::from)
+                .toList();
+
+        Map<String, Object> body = Map.of(
+                "employee", UserDto.from(emp),
+                "balances", balances
+        );
+
+
+        return ResponseEntity.created(URI.create("/api/employees/" + emp.getId())).body(body);
     }
 
     // ── Holidays ──────────────────────────────────────────────────────────────

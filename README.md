@@ -81,7 +81,17 @@ Hackforge/
 
 ---
 
-### 1. Running the Backend
+### Quick Start (One-Click)
+
+Run either script from the project root to start both backend (port 8080) and frontend (port 3000) simultaneously:
+- **Windows Command Prompt**: `run.bat`
+- **PowerShell**: `.\run.ps1`
+
+---
+
+### Manual Start
+
+#### 1. Running the Backend
 
 Open a terminal in `leave-management`:
 
@@ -101,7 +111,7 @@ To run the automated test suite (23 unit & integration tests):
 
 ---
 
-### 2. Running the Frontend
+#### 2. Running the Frontend
 
 Open a terminal in `leavema`:
 
@@ -111,7 +121,7 @@ npm install
 npm run dev
 ```
 
-*Frontend starts at `http://localhost:5173/`.*
+*Frontend starts at `http://localhost:3000/`.*
 
 ---
 
