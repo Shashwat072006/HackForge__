@@ -35,6 +35,9 @@ Thumbs.db
 reports/*.xlsx
 !leave-management/src/main/resources/samples/*.xlsx
 h2/
+data/
+*.mv.db
+*.trace.db
 
 # Environment / local configs
 application-local.yml
