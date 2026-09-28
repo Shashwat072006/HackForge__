@@ -5,16 +5,19 @@ import App from './App';
 import './index.css';
 
 async function prepareApp() {
-  if (import.meta.env.DEV || !import.meta.env.VITE_USE_REAL_BACKEND) {
+  const useRealBackend = import.meta.env.VITE_USE_REAL_BACKEND === 'true';
+  if (!useRealBackend) {
     try {
       const { worker } = await import('./mocks/browser');
       await worker.start({
         onUnhandledRequest: 'bypass',
       });
-      console.log('✅ MSW Mock Service Worker active');
+      console.log('✅ MSW Mock Service Worker active (Mock Mode)');
     } catch (e) {
       console.warn('MSW could not start:', e);
     }
+  } else {
+    console.log('⚡ Connected directly to Spring Boot backend:', import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api');
   }
 }
 

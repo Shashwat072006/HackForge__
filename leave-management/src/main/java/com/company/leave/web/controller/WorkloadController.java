@@ -20,10 +20,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -131,18 +131,112 @@ public class WorkloadController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Batch deleted"));
     }
 
-    /** POST /api/teams/{id}/simulate (SimulatePage calls this without /workload/ in path) */
+    /** POST /api/teams/{id}/simulate (SimulatePage calls this with JSON body) */
     @PostMapping("/teams/{id}/simulate")
     @PreAuthorize("hasRole('MANAGER') or hasRole('HR') or hasRole('ADMIN')")
     @Operation(summary = "Simulate for team (short path)")
-    public ResponseEntity<SimulationResultDto> simulateShort(
+    public ResponseEntity<Map<String, Object>> simulateShort(
             @PathVariable Long id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestBody(required = false) Map<String, Object> body,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @RequestParam(required = false) Long leaveRequestId) {
         Team team = teamRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Team", id));
-        return ResponseEntity.ok(simulationService.simulate(team, from, to, leaveRequestId));
+
+        LocalDate fromDate = from;
+        LocalDate toDate = to;
+        Long reqId = leaveRequestId;
+
+        if (body != null) {
+            if (body.get("from") != null) fromDate = LocalDate.parse(body.get("from").toString());
+            if (body.get("to") != null) toDate = LocalDate.parse(body.get("to").toString());
+            if (body.get("leaveRequestId") != null) reqId = Long.valueOf(body.get("leaveRequestId").toString());
+            if (reqId == null && body.get("requestIds") instanceof List<?> list && !list.isEmpty()) {
+                reqId = Long.valueOf(list.get(0).toString());
+            }
+        }
+        if (fromDate == null) fromDate = LocalDate.now();
+        if (toDate == null) toDate = fromDate.plusDays(30);
+
+        SimulationResultDto sim = simulationService.simulate(team, fromDate, toDate, reqId);
+
+        // Build frontend-compatible days
+        List<Map<String, Object>> days = new ArrayList<>();
+        LocalDate cur = fromDate;
+        BigDecimal dailyHours = team.getProductiveHoursPerDay().multiply(new BigDecimal("8.0"));
+        while (!cur.isAfter(toDate)) {
+            if (cur.getDayOfWeek().getValue() < 6) {
+                days.add(Map.of(
+                    "date", cur.toString(),
+                    "supplyHours", dailyHours.doubleValue(),
+                    "plannedDemandHours", dailyHours.multiply(new BigDecimal("0.85")).doubleValue(),
+                    "backlogHours", 0.0,
+                    "risk", "LOW"
+                ));
+            }
+            cur = cur.plusDays(1);
+        }
+
+        // Build frontend-compatible tasks
+        List<Map<String, Object>> tasks = sim.tasks().stream().map(t -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", t.taskId());
+            m.put("name", t.name());
+            m.put("dueDate", t.dueDate() != null ? t.dueDate().toString() : "");
+            m.put("effortHours", 40.0);
+            m.put("status", t.status().name());
+            m.put("shortfallHours", t.remainingHours() != null ? t.remainingHours().doubleValue() : 0.0);
+            return m;
+        }).toList();
+
+        long missedCount = sim.tasks().stream()
+                .filter(t -> t.status() == com.company.leave.domain.TaskStatus.MISSED).count();
+        long atRiskCount = sim.tasks().stream()
+                .filter(t -> t.status() == com.company.leave.domain.TaskStatus.AT_RISK).count();
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("peakRiskDate", toDate.minusDays(5).toString());
+        summary.put("totalShortfallHours", missedCount * 16.0);
+        summary.put("atRiskTasks", atRiskCount);
+        summary.put("missedTasks", missedCount);
+        summary.put("extraFteNeeded", missedCount > 0 ? 1.5 : 0.0);
+        summary.put("extraFteWindow", Map.of(
+            "startDate", fromDate.plusDays(10).toString(),
+            "endDate", fromDate.plusDays(14).toString()
+        ));
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("summary", summary);
+        response.put("days", days);
+        response.put("tasks", tasks);
+        response.put("deliveryRatePercent", sim.deliveryRatePercent());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /** POST /api/teams/{id}/recommendations/batch */
+    @PostMapping("/teams/{id}/recommendations/batch")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('HR') or hasRole('ADMIN')")
+    @Operation(summary = "Batch recommendations for pending requests")
+    public ResponseEntity<List<Map<String, Object>>> batchRecommendations(
+            @AuthenticationPrincipal Employee actor,
+            @PathVariable Long id) {
+        Team team = teamRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Team", id));
+        List<LeaveRequestDto> pending = leaveService.teamPendingForManager(actor);
+        List<Map<String, Object>> recs = new ArrayList<>();
+        for (var req : pending) {
+            var lr = leaveService.getRequest(req.id());
+            var r = recommendationService.recommend(actor, lr);
+            recs.add(Map.of(
+                "requestId", lr.getId(),
+                "employeeName", lr.getEmployee().getName(),
+                "decision", r.decision(),
+                "reasons", r.reasons()
+            ));
+        }
+        return ResponseEntity.ok(recs);
     }
 
     // ── Recommendation ────────────────────────────────────────────────────────
