@@ -62,23 +62,26 @@ export default function DashboardPage() {
           {balLoading ? (
             Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} height={120} />)
           ) : (
-            balances?.map((b, idx) => (
-              <div key={b.leaveType} className={`small-box ${BG_COLORS[idx % BG_COLORS.length]}`}>
-                <div className="inner">
-                  <h3>{fmtDays(b.available)} <span style={{ fontSize: '16px', fontWeight: 400 }}>days</span></h3>
-                  <p>{b.leaveType.replace(/_/g, ' ')} LEAVE</p>
-                  <div style={{ fontSize: '11.5px', marginTop: 6, opacity: 0.88 }}>
-                    Total: {fmtDays(b.total)} | Used: {fmtDays(b.used)} | Pending: {fmtDays(b.pending)}
+            balances?.map((b, idx) => {
+              const typeName = (b.leaveType || (b as any).code || (b as any).name || 'LEAVE').toString();
+              return (
+                <div key={b.leaveType || idx} className={`small-box ${BG_COLORS[idx % BG_COLORS.length]}`}>
+                  <div className="inner">
+                    <h3>{fmtDays(b.available)} <span style={{ fontSize: '16px', fontWeight: 400 }}>days</span></h3>
+                    <p>{typeName.replace(/_/g, ' ')} LEAVE</p>
+                    <div style={{ fontSize: '11.5px', marginTop: 6, opacity: 0.88 }}>
+                      Total: {fmtDays(b.total ?? b.available)} | Used: {fmtDays(b.used)} | Pending: {fmtDays(b.pending)}
+                    </div>
                   </div>
+                  <div className="icon">
+                    {ICONS[idx % ICONS.length]}
+                  </div>
+                  <Link to="/apply" className="small-box-footer">
+                    Apply Now →
+                  </Link>
                 </div>
-                <div className="icon">
-                  {ICONS[idx % ICONS.length]}
-                </div>
-                <Link to="/apply" className="small-box-footer">
-                  Apply Now →
-                </Link>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
@@ -120,7 +123,7 @@ export default function DashboardPage() {
                   ) : (
                     recentLeaves.map((l) => (
                       <tr key={l.id}>
-                        <td style={{ fontWeight: 600 }}>{l.leaveType}</td>
+                        <td style={{ fontWeight: 600 }}>{(l.leaveType || (l as any).leaveTypeName || 'LEAVE').replace(/_/g, ' ')}</td>
                         <td>{fmtDate(l.startDate)} &rarr; {fmtDate(l.endDate)}</td>
                         <td><strong>{l.workingDays}</strong></td>
                         <td style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

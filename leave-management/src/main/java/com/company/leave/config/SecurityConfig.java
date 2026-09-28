@@ -36,7 +36,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/h2-console/**",
-            "/actuator/health"
+            "/actuator/**"
     };
 
     @Bean
@@ -48,9 +48,14 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Public backend endpoints
                         .requestMatchers(PUBLIC_PATHS).permitAll()
+                        // Require authentication for all protected /api/** endpoints
+                        .requestMatchers("/api/**").authenticated()
+                        // Allow OPTIONS pre-flight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().authenticated()
+                        // Allow all static resources & SPA client routes (/, /login, /dashboard, etc.)
+                        .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
                 .exceptionHandling(ex -> ex

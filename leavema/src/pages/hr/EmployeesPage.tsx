@@ -89,9 +89,9 @@ export default function EmployeesPage() {
         <div className="callout callout-success" style={{ marginBottom: 20 }}>
           <h4 style={{ margin: '0 0 8px 0', fontSize: 15 }}>Employee Created Successfully — Pro-rated Balances Generated</h4>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            {createdBalances.map((b) => (
-              <div key={b.leaveType} style={{ background: '#fff', border: '1px solid #d4edda', borderRadius: 3, padding: '6px 12px', fontSize: 13 }}>
-                <strong>{b.leaveType.replace(/_/g, ' ')}:</strong> {b.available} / {b.total} days
+            {createdBalances.map((b, idx) => (
+              <div key={b.leaveType || idx} style={{ background: '#fff', border: '1px solid #d4edda', borderRadius: 3, padding: '6px 12px', fontSize: 13 }}>
+                <strong>{((b.leaveType || (b as any).code || 'LEAVE')).replace(/_/g, ' ')}:</strong> {b.available} / {b.total ?? b.available} days
               </div>
             ))}
           </div>

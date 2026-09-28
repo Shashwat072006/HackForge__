@@ -13,6 +13,7 @@ public record LeaveRequestDto(
         String employeeName,
         Long leaveTypeId,
         String leaveTypeName,
+        String leaveType,
         LocalDate startDate,
         LocalDate endDate,
         BigDecimal workingDays,
@@ -27,12 +28,14 @@ public record LeaveRequestDto(
         List<HistoryDto> history
 ) {
     public static LeaveRequestDto from(LeaveRequest lr, List<ApprovalHistory> history) {
+        String code = lr.getLeaveType().getCode() != null ? lr.getLeaveType().getCode().name() : lr.getLeaveType().getName();
         return new LeaveRequestDto(
                 lr.getId(),
                 lr.getEmployee().getId(),
                 lr.getEmployee().getName(),
                 lr.getLeaveType().getId(),
                 lr.getLeaveType().getName(),
+                code,
                 lr.getStartDate(),
                 lr.getEndDate(),
                 lr.getWorkingDays(),

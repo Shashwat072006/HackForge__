@@ -83,15 +83,20 @@ Hackforge/
 
 ### Quick Start (One-Click)
 
-Run either script from the project root to start both backend (port 8080) and frontend (port 3000) simultaneously:
+The frontend and backend run together as a single unified service on one link:
 - **Windows Command Prompt**: `run.bat`
 - **PowerShell**: `.\run.ps1`
+
+Once launched, everything is accessible on **`http://localhost:8080`**:
+- 🌐 **Web Application (Frontend + Backend)**: [http://localhost:8080](http://localhost:8080)
+- 📖 **Swagger REST API Docs**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- 🗄️ **H2 Database Console**: [http://localhost:8080/h2-console](http://localhost:8080/h2-console) (JDBC URL: `jdbc:h2:file:./data/leavedb`, User: `sa`)
 
 ---
 
 ### Manual Start
 
-#### 1. Running the Backend
+#### Running the Unified Application
 
 Open a terminal in `leave-management`:
 
@@ -100,9 +105,7 @@ cd leave-management
 .\mvnw.cmd spring-boot:run
 ```
 
-*By default, runs on port `8080` with an H2 file-backed database initialized with Flyway migrations.*
-- **Swagger API Docs**: `http://localhost:8080/swagger-ui.html`
-- **H2 Console**: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:./data/leavedb`, User: `sa`, Password: *(blank)*)
+*Runs both the React SPA and Spring Boot REST API on port `8080`.*
 
 To run the automated test suite (23 unit & integration tests):
 ```powershell
@@ -111,17 +114,14 @@ To run the automated test suite (23 unit & integration tests):
 
 ---
 
-#### 2. Running the Frontend
+#### Optional: Frontend Hot-Reload Dev Server
 
-Open a terminal in `leavema`:
-
+For active frontend development with instant HMR:
 ```powershell
 cd leavema
-npm install
 npm run dev
 ```
-
-*Frontend starts at `http://localhost:3000/`.*
+*Vite dev server starts on `http://localhost:3000/` and automatically proxies `/api` calls to port 8080.*
 
 ---
 

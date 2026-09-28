@@ -136,7 +136,7 @@ export default function ApprovalsPage({ isHR = false }: ApprovalsPageProps) {
                         </td>
                         <td>{fmtDate(l.startDate)} – {fmtDate(l.endDate)}</td>
                         <td><strong>{fmtDays(l.workingDays)}</strong></td>
-                        <td>{l.leaveType.replace(/_/g, ' ')}</td>
+                        <td>{(l.leaveType || (l as any).leaveTypeName || 'LEAVE').replace(/_/g, ' ')}</td>
                         <td>
                           {l.feasibilityPercent != null ? (
                             <span

@@ -141,7 +141,7 @@ export default function MyLeavesPage() {
                         style={{ cursor: 'pointer' }}
                         onClick={() => setSelectedId(l.id)}
                       >
-                        <td style={{ fontWeight: 600 }}>{l.leaveType.replace(/_/g, ' ')}</td>
+                        <td style={{ fontWeight: 600 }}>{(l.leaveType || (l as any).leaveTypeName || 'LEAVE').replace(/_/g, ' ')}</td>
                         <td>{fmtDate(l.startDate)} – {fmtDate(l.endDate)}</td>
                         <td><strong>{fmtDays(l.workingDays)}</strong></td>
                         <td>
@@ -199,7 +199,7 @@ export default function MyLeavesPage() {
                     <tbody>
                       <tr>
                         <td style={{ color: '#777', paddingBottom: 8, width: '40%' }}>Leave Type</td>
-                        <td style={{ fontWeight: 600, paddingBottom: 8 }}>{selected.leaveType.replace(/_/g, ' ')}</td>
+                        <td style={{ fontWeight: 600, paddingBottom: 8 }}>{(selected.leaveType || (selected as any).leaveTypeName || 'LEAVE').replace(/_/g, ' ')}</td>
                       </tr>
                       <tr>
                         <td style={{ color: '#777', paddingBottom: 8 }}>Duration</td>

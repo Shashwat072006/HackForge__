@@ -1,5 +1,5 @@
 Write-Host "========================================================" -ForegroundColor Cyan
-Write-Host "  Hackforge - Starting Backend and Frontend" -ForegroundColor Cyan
+Write-Host "  Hackforge - Unified Leave Management System" -ForegroundColor Cyan
 Write-Host "========================================================" -ForegroundColor Cyan
 
 $root = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
@@ -15,13 +15,12 @@ if (-not $env:JAVA_HOME) {
     }
 }
 
-Write-Host "Starting Spring Boot Backend on http://localhost:8080 ..." -ForegroundColor Yellow
+Write-Host "Starting Unified Application (Frontend + Backend) on http://localhost:8080 ..." -ForegroundColor Yellow
 Start-Process powershell -WorkingDirectory "$root\leave-management" -ArgumentList "-NoExit", "-Command", "`$env:JAVA_HOME = '$env:JAVA_HOME'; .\mvnw.cmd spring-boot:run"
 
-Write-Host "Starting React Frontend on http://localhost:3000 ..." -ForegroundColor Green
-Start-Process powershell -WorkingDirectory "$root\leavema" -ArgumentList "-NoExit", "-Command", "npm run dev"
-
-Write-Host "`nBoth servers have been launched in separate windows!" -ForegroundColor Cyan
-Write-Host "Backend Swagger API: http://localhost:8080/swagger-ui.html"
-Write-Host "Frontend Application: http://localhost:3000"
+Write-Host "`n========================================================" -ForegroundColor Cyan
+Write-Host "  Access Everything On One Link:" -ForegroundColor Green
+Write-Host "  Application (Frontend + Backend): http://localhost:8080" -ForegroundColor White
+Write-Host "  Swagger REST API Docs:           http://localhost:8080/swagger-ui.html" -ForegroundColor White
+Write-Host "  H2 Database Console:             http://localhost:8080/h2-console" -ForegroundColor White
 Write-Host "========================================================" -ForegroundColor Cyan
