@@ -2,6 +2,9 @@
 
 An end-to-end, industry-grade leave management and workforce capacity planning system. Built with **Spring Boot 3 (Java 21)** and **React 19 + TypeScript + Vite**.
 
+> 🌐 **Live Demo (Vercel)**: [https://hackforgeleave.vercel.app](https://hackforgeleave.vercel.app)  
+> 🚀 **Vercel Deployment Dashboard**: [View Deployment Details](https://vercel.com/shashwat18072006-3959s-projects/hackforgeleave/CEmqiD4TEQSNxc1STKPDDAkjGBK4)
+
 ---
 
 ## 🌟 Key Features
@@ -141,16 +144,18 @@ All demo accounts use password: **`Demo@123`**
 
 ## ☁️ Cloud Deployment
 
-### 1. Deploy Frontend to Vercel (1-Click)
-Deploy the React interface directly to Vercel with one click:
+### 1. Live Deployment on Vercel
+- 🌐 **Live Demo URL**: [https://hackforgeleave.vercel.app](https://hackforgeleave.vercel.app)
+- 📊 **Vercel Project Dashboard**: [https://vercel.com/shashwat18072006-3959s-projects/hackforgeleave/CEmqiD4TEQSNxc1STKPDDAkjGBK4](https://vercel.com/shashwat18072006-3959s-projects/hackforgeleave/CEmqiD4TEQSNxc1STKPDDAkjGBK4)
 
+#### Deploying a New Instance to Vercel (1-Click)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShashwat072006%2FHackForge__&root-directory=leavema)
 
-- **Direct Vercel Deploy Link**: [Deploy on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShashwat072006%2FHackForge__&root-directory=leavema)
-- **Settings in Vercel**:
+- **Direct Deploy Link**: [Deploy on Vercel](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FShashwat072006%2FHackForge__&root-directory=leavema)
+- **Settings**:
   - **Framework Preset**: Vite
   - **Root Directory**: `leavema`
-  - **Environment Variables** (Optional, if connecting to a live backend):
+  - **Environment Variables** (Optional, if connecting to an external live backend):
     - `VITE_API_BASE_URL`: `https://your-backend-service.onrender.com/api`
     - `VITE_USE_REAL_BACKEND`: `true` (or `false` for standalone offline demo mode)
 
