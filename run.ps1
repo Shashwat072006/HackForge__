@@ -2,6 +2,8 @@ Write-Host "========================================================" -Foregroun
 Write-Host "  Hackforge - Starting Backend and Frontend" -ForegroundColor Cyan
 Write-Host "========================================================" -ForegroundColor Cyan
 
+$root = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
+
 if (-not $env:JAVA_HOME) {
     $javaCmd = (Get-Command java -ErrorAction SilentlyContinue)
     if ($javaCmd) {
@@ -14,10 +16,10 @@ if (-not $env:JAVA_HOME) {
 }
 
 Write-Host "Starting Spring Boot Backend on http://localhost:8080 ..." -ForegroundColor Yellow
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd leave-management; `$env:JAVA_HOME = '$env:JAVA_HOME'; .\mvnw.cmd spring-boot:run"
+Start-Process powershell -WorkingDirectory "$root\leave-management" -ArgumentList "-NoExit", "-Command", "`$env:JAVA_HOME = '$env:JAVA_HOME'; .\mvnw.cmd spring-boot:run"
 
 Write-Host "Starting React Frontend on http://localhost:3000 ..." -ForegroundColor Green
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd leavema; npm run dev"
+Start-Process powershell -WorkingDirectory "$root\leavema" -ArgumentList "-NoExit", "-Command", "npm run dev"
 
 Write-Host "`nBoth servers have been launched in separate windows!" -ForegroundColor Cyan
 Write-Host "Backend Swagger API: http://localhost:8080/swagger-ui.html"
