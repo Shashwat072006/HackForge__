@@ -1,0 +1,5 @@
+leave:
+  escalation:
+    manager-timeout-minutes: 1
+    hr-timeout-minutes: 2
+    check-interval-ms: 10000

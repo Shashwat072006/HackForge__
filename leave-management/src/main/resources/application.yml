@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: leave-management
+
+  datasource:
+    url: jdbc:h2:file:./data/leavedb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  h2:
+    console:
+      enabled: false   # enabled per-profile in application-dev.yml
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: alpha
+    tagsSorter: alpha
+  default-produces-media-type: application/json
+
+leave:
+  jwt:
+    secret: ${JWT_SECRET:ChangeThisSecretKeyInProductionItMustBeAtLeast64BytesLongForHS512AlgorithmSupport}
+    expiration-ms: 86400000
+  weekend-days: SATURDAY,SUNDAY
+  escalation:
+    manager-timeout-minutes: 2880
+    hr-timeout-minutes: 4320
+    check-interval-ms: 300000
+  reports:
+    cron: "0 0 1 1 * *"
+    dir: ./reports
+  cors:
+    # Override with your frontend URL in production, e.g.: http://192.168.1.50:3000
+    # Accepts a comma-separated list. * means allow any origin (fine for dev/hackathon).
+    allowed-origins: "*"

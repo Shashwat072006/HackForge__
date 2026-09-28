@@ -1,0 +1,40 @@
+# Root .gitignore for Hackforge
+
+# Java / Maven build artifacts
+**/target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node / Frontend build artifacts
+**/node_modules/
+**/dist/
+**/dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# IDE & OS
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+**/.git_bak/
+
+# Generated files & logs
+*.log
+reports/*.xlsx
+!leave-management/src/main/resources/samples/*.xlsx
+h2/
+
+# Environment / local configs
+application-local.yml
